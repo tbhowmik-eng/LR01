@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Operating Speed & Safety Literature – Summary Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color-scheme: light dark;
+      --bg: #f4f5f7;
+      --card-bg: #ffffff;
+      --card-border: #e0e4ea;
+      --accent: #004b9b;
+      --accent-soft: #e1ecff;
+      --text-main: #111827;
+      --text-subtle: #4b5563;
+      --shadow-soft: 0 12px 28px rgba(15, 23, 42, 0.08);
+      --radius-xl: 18px;
+      --radius-md: 10px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text-main);
+      font-size: 1.1rem;
+    }
+
+    .app-shell {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 1.5rem 1.25rem 2.5rem;
+    }
+
+    header { margin-bottom: 1.75rem; }
+
+    h1 {
+      font-size: 1.6rem;
+      margin: 0 0 0.35rem 0;
+      letter-spacing: 0.03em;
+    }
+
+    h2 {
+      font-size: 1.3rem;
+      margin: 0 0 0.6rem 0;
+    }
+
+    h3 {
+      font-size: 1.15rem;
+      margin: 0 0 0.4rem 0;
+    }
+
+    .subtitle {
+      font-size: 1.2rem;
+      color: var(--text-subtle);
+      max-width: 1600px;
+      text-align: justify;
+      text-justify: inter-word;
+    }
+
+    .pill-row {
+      margin-top: 0.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+.pill {
+  font-size: 1.2rem;               /* bigger text */
+  padding: 0.35rem 1rem;
+  border-radius: 999px;
+  background: #edf3ff;             /* solid blue background */
+  color: #2358a5;                  /* white text */
+  font-weight: 700;                /* bold */
+  font-style: italic;              /* italic */
+  border: none;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+}
+
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.2fr);
+      gap: 1.25rem;
+    }
+
+    @media (max-width: 960px) {
+      .grid-2 { grid-template-columns: minmax(0, 1fr); }
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius-xl);
+      border: 1px solid var(--card-border);
+      box-shadow: var(--shadow-soft);
+      padding: 1rem 1.15rem 1.25rem;
+      margin-bottom: 1.25rem;
+    }
+
+    /* Make ONLY the explorer card a bit wider */
+    .wide-table {
+      width: 100%;
+      max-width: 100%;
+      margin-left: 0;
+      margin-right: 0;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .label {
+      font-size: 0.95rem;
+      text-transform: capitalize;
+      letter-spacing: 0.1em;
+      color: var(--text-subtle);
+    }
+
+    .stat-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+    }
+
+    .stat {
+      flex: 1 1 150px;
+      border-radius: var(--radius-md);
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      padding: 0.7rem 0.9rem;
+    }
+
+    .stat-key {
+      font-size: 0.95rem;
+      color: var(--text-subtle);
+    }
+
+    .stat-value {
+      font-size: 1.3rem;
+      font-weight: 600;
+    }
+
+    .stat-sub {
+      font-size: 0.95rem;
+      color: var(--text-subtle);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 0.35rem;
+    }
+
+    th, td {
+      padding: 0.45rem 0.4rem;
+      text-align: left;
+      font-size: 0.98rem;
+      border-bottom: 1px solid #e5e7eb;
+      vertical-align: top;
+    }
+
+    th {
+      font-size: 0.95rem;
+      text-transform: capitalize;
+      letter-spacing: 0.06em;
+      color: var(--text-subtle);
+    }
+
+    .section-text {
+      font-size: 1.05rem;
+      color: var(--text-subtle);
+      line-height: 1.5;
+    }
+
+    ul, ol {
+      margin-top: 0.25rem;
+      margin-bottom: 0.25rem;
+      padding-left: 1.4rem;
+    }
+
+    li { margin: 0.15rem 0; }
+
+    canvas { max-width: 100%; }
+
+    .footnote {
+      margin-top: 0.5rem;
+      font-size: 0.95rem;
+      color: var(--text-subtle);
+    }
+
+    /* --- Interactive explorer styles --- */
+    .controls-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      min-width: 190px;
+      flex: 1 1 190px;
+    }
+
+    label {
+      font-size: 0.95rem;
+      color: var(--text-subtle);
+    }
+
+    select,
+    input[type="search"] {
+      border-radius: 999px;
+      border: 1px solid #d0d7e2;
+      padding: 0.45rem 0.9rem;
+      font-size: 1.05rem;
+      outline: none;
+      background: #ffffff;
+    }
+
+    select:focus,
+    input[type="search"]:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(0, 75, 155, 0.18);
+    }
+
+    .chips-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 0.6rem;
+    }
+
+    .chip {
+      font-size: 0.9rem;
+      padding: 0.25rem 0.7rem;
+      border-radius: 999px;
+      background: #edf2ff;
+      color: #273b80;
+    }
+
+    .table-wrapper {
+      max-height: 300px;
+      overflow: auto;
+      border-radius: var(--radius-xl);
+      border: 1px solid var(--card-border);
+      background: #ffffff;
+      box-shadow: var(--shadow-soft);
+    }
+
+    /* Sticky header so headings stay when scrolling */
+    .table-wrapper thead {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      background: #f1f5f9;
+    }
+
+    .study-table { width: 100%; border-collapse: collapse; }
+
+    .study-table th,
+    .study-table td {
+      border-bottom: 1px solid #e5e7eb;
+      padding: 0.5rem 0.45rem;
+      font-size: 0.96rem;
+    }
+
+    .study-title {
+      font-weight: 600;
+      margin-bottom: 0.1rem;
+    }
+
+    .study-meta {
+      font-size: 0.92rem;
+      color: var(--text-subtle);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.15rem 0.5rem;
+      border-radius: 999px;
+      font-size: 0.86rem;
+      background: #eef2ff;
+      color: #3730a3;
+    }
+
+    .badge.international {
+      background: #ecfdf5;
+      color: #047857;
+    }
+
+    .speed-metrics {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.25rem;
+    }
+
+    .speed-metrics span {
+      font-size: 0.9rem;
+      padding: 0.18rem 0.55rem;
+      border-radius: 999px;
+      background: #f3f4ff;
+      color: #273b80;
+    }
+
+    /* Key findings as bullet list */
+    .key-findings {
+      margin: 0.15rem 0;
+      padding-left: 1.2rem;
+      font-size: 0.96rem;
+      color: var(--text-subtle);
+      line-height: 1.45;
+    }
+
+    .key-findings li {
+      margin-bottom: 0.15rem;
+    }
+  </style>
+</head>
+<body>
+<div class="app-shell">
+  <header>
+    <h1>Operating Speed & Crash Outcomes – Literature Summary Dashboard</h1>
+    <p class="subtitle">
+      This dashboard offers a clear and organized look at what past research tells us about operating speed and roadway safety. It brings together key studies, highlights the speed measures researchers commonly use, and shows how these measures relate to crash outcomes across different road types. You can explore individual studies interactively or scroll down to see overall patterns and insights. The goal is to make the existing evidence easy to understand, compare, and apply; whether you are reviewing methods, identifying trends, or looking for gaps that future research can address.
+    </p>
+    <div class="pill-row">
+      <span class="pill">10 Studies Reviewed</span>
+      <span class="pill">5 U.S. based &amp; 5 International</span>
+    </div>
+  </header>
+
+  <!-- Interactive Study Explorer (now second) -->
+  <section class="card wide-table">
+    <div class="card-header">
+      <h2> Interactive Study Explorer</h2>
+      <span class="label"></span>
+    </div>
+
+    <div class="controls-row">
+      <div class="control-group">
+        <label for="regionFilter">Region</label>
+        <select id="regionFilter">
+          <option value="all">All regions</option>
+          <option value="US">United States</option>
+          <option value="International">International</option>
+        </select>
+      </div>
+      <div class="control-group">
+        <label for="facilityFilter">Facility type</label>
+        <select id="facilityFilter">
+          <option value="all">All facility types</option>
+        </select>
+      </div>
+      <div class="control-group">
+        <label for="dataFilter">Speed data source</label>
+        <select id="dataFilter">
+          <option value="all">All data sources</option>
+        </select>
+      </div>
+      <div class="control-group">
+        <label for="severityFilter">Severity definition</label>
+        <select id="severityFilter">
+          <option value="all">All severity types</option>
+        </select>
+      </div>
+      <div class="control-group">
+        <label for="searchBox">Search (author, metric, key finding)</label>
+        <input id="searchBox" type="search" placeholder="e.g., variability, NPMRDS, 85th percentile" />
+      </div>
+    </div>
+
+    <div class="chips-row" id="activeSummary"></div>
+
+    <div class="table-wrapper">
+      <table class="study-table">
+        <thead>
+        <tr>
+          <th style="min-width:180px;">Study</th>
+          <th style="min-width:170px;">Area &amp; facility</th>
+          <th style="min-width:200px;">Speed metrics</th>
+          <th style="min-width:190px;">Speed data source</th>
+          <th style="min-width:170px;">Crash / model</th>
+          <th style="min-width:260px;">Key findings (speed–crash)</th>
+        </tr>
+        </thead>
+        <tbody id="studyTableBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 3. Speed metrics -->
+  <section class="card">
+    <div class="card-header">
+      <h2>1. Speed Metrics Considered Across Studies</h2>
+    </div>
+
+    <div class="grid-2">
+      <div>
+        <h3>Speed metrics frequency</h3>
+        <table>
+          <thead>
+          <tr>
+            <th>Speed metric</th>
+            <th>Number of studies</th>
+            <th>Notes</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td>Mean operating speed</td>
+            <td>10 / 10</td>
+            <td>Effects varied across studies: some found higher mean speeds linked to more crashes, while others found the opposite, depending on facility type and roadway design.</td>
+          </tr>
+          <tr>
+            <td>85th percentile speed</td>
+            <td>4</td>
+            <td>When available, this measure generally showed a positive association with crash frequency, especially on urban streets and rural freeways.</td>
+          </tr>
+          <tr>
+            <td>Speed variability (SD, CoV, within/between-lane, temporal)</td>
+            <td>7</td>
+            <td>consistent effect across studies; higher variability was strongly associated with increased crash frequency and/or severit.</td>
+          </tr>
+          <tr>
+            <td>Speed differential (operating – PSL or PSL – operating)</td>
+            <td>5</td>
+            <td>Larger gaps indicated driver non-compliance and were associated with higher crash frequency.</td>
+          </tr>
+          <tr>
+            <td>Median speed</td>
+            <td>1</td>
+            <td>Used in one study; showed similar directional effects as mean speed but offered little additional explanatory value.</td>
+          </tr>
+          <tr>
+            <td>Within-/between-lane variability</td>
+            <td>1</td>
+            <td>Higher dispersion was associated with elevated crash risk, especially on multilane freeways under high traffic volumes..</td>
+          </tr>
+          <tr>
+            <td>Weekend–weekday speed differential</td>
+            <td>1</td>
+            <td>Larger temporal differences were linked to higher crash occurrence, especially in rural networks..</td>
+          </tr>
+          <tr>
+            <td>Non-peak mean speed</td>
+            <td>1</td>
+            <td>Effects were context-specific; changes in off-peak speeds were associated with shifts in crash patterns depending on roadway type and traffic state..</td>
+          </tr>
+          </tbody>
+        </table>
+        <div class="section-text" style="margin-top:0.6rem;">
+          <strong>Summary:</strong> Mean speed was included in all studies, but its effects varied by context. Metrics that captured speed distributions showed stronger and more consistent relationships with crash frequency and severity. These measures were used less often because detailed speed data were not always available.
+        </div>
+      </div>
+
+      <div>
+        <h3>Visual summary</h3>
+        <canvas id="metricChart" height="230" ></canvas>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. Speed data sources -->
+  <section class="card">
+    <div class="card-header">
+      <h2>2. Speed Data Sources Used Across Studies</h2>
+    </div>
+
+    <div class="grid-2">
+      <div>
+        <h3>Types of speed data</h3>
+        <table>
+          <thead>
+          <tr>
+            <th>Data source type</th>
+            <th>Number of studies</th>
+            <th>Notes</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td>Probe-based space-mean speeds (e.g., NPMRDS, HERE)</td>
+            <td>3</td>
+            <td>Broad coverage but no vehicle-level distributions.</td>
+          </tr>
+          <tr>
+            <td>Per-vehicle trajectory data (floating car, taxis, GPS, individual records)</td>
+            <td>3</td>
+            <td>Supports variability and percentile metrics; coverage limited.</td>
+          </tr>
+          <tr>
+            <td>Loop detectors / inductive sensors (time-mean)</td>
+            <td>3</td>
+            <td>High-resolution lane-level speeds; used mainly in studies conducted in England and China.</td>
+          </tr>
+          <tr>
+            <td>Tube counters / spot-speed devices</td>
+            <td>1</td>
+            <td>Accurate point speeds; limited spatial scope.</td>
+          </tr>
+
+          </tbody>
+        </table>
+        <div class="section-text" style="margin-top:0.6rem;">
+          <strong>Summary:</strong> Studies using probe-based speed data considered many locations, while studies using per-vehicle or time-mean data typically included far fewer locations.
+        </div>
+      </div>
+
+      <div>
+        <h3>Visual summary</h3>
+        <canvas id="dataChart" height="230"></canvas>
+        <div class="footnote">
+          Note: some studies use multiple data forms; counts above reflect the primary
+          source used for modeling.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. Facility types -->
+  <section class="card">
+    <div class="card-header">
+      <h2>3. Facility Types Represented</h2>
+    </div>
+
+    <div class="grid-2">
+      <div>
+        <h3>Facility categories and coverage</h3>
+        <table>
+          <thead>
+          <tr>
+            <th>Facility type</th>
+            <th>Number of studies</th>
+            <th>Examples</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td>Rural highways / two-lane roads</td>
+            <td>4</td>
+            <td>Kentucky two-lane, Utah usRAP roads, HSIS rural segments, Michigan rural freeways.</td>
+          </tr>
+          <tr>
+            <td>Urban arterials</td>
+            <td>3</td>
+            <td>Shanghai arterials, Edmonton streets, U.S. arterial corridors.</td>
+          </tr>
+          <tr>
+            <td>City streets / collectors</td>
+            <td>1</td>
+            <td>Austin city street network.</td>
+          </tr>
+          <tr>
+            <td>Motorways / freeways (international)</td>
+            <td>5</td>
+            <td>England SRN, M1 motorway, Shanghai expressways.</td>
+          </tr>
+          <tr>
+            <td>Mixed facility statewide datasets</td>
+            <td>1</td>
+            <td>HSIS + NPMRDS study, Washington RID analysis.</td>
+          </tr>
+          </tbody>
+        </table>
+        <div class="section-text" style="margin-top:0.6rem;">
+          <strong>Summary:</strong> The literature is heavily weighted toward motorways, freeways, and
+          arterials. Urban collectors and low-speed downtown grids are rarely evaluated, leaving a
+          gap that is important for HSM applications on city networks.
+        </div>
+      </div>
+
+      <div>
+        <h3>Visual summary</h3>
+        <canvas id="facilityChart" height="230"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. Crash types / severity scales -->
+  <section class="card">
+    <div class="card-header">
+      <h2>4. Crash Types & Severity Scales Used</h2>
+    </div>
+
+    <div class="grid-2">
+      <div>
+        <h3>Severity scales in the reviewed studies</h3>
+        <table>
+          <thead>
+          <tr>
+            <th>Crash outcome type</th>
+            <th>Number of studies</th>
+            <th>Notes</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td>Full KABCO Scale</td>
+            <td>6</td>
+            <td>Captures how speed affects crash outcomes across the full severity spectrum.</td>
+          </tr>
+          <tr>
+            <td>Some severity classes (Fatal/Injury)</td>
+            <td>3</td>
+            <td>Captures how speed influences the likelihood of more severe outcomes.</td>
+          </tr>
+          <tr>
+            <td>Total Crashes Only</td>
+            <td>1</td>
+            <td>Capture speed influence on overall crash pattern , ireespecitve of the differences in severity distribution.</td>
+          </tr>
+          </tbody>
+        </table>
+        <div class="section-text" style="margin-top:0.6rem;">
+          <strong>Summary:</strong> Across studies, speed measures influenced crashes differently depending on the severity level considered. Total-crash models showed single effects, while severity-specific analysis revealed mixed impact across severities.
+        </div>
+      </div>
+
+      <div>
+        <h3>Visual summary</h3>
+        <canvas id="severityChart" height="230"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. Integrated summary -->
+  <section class="card">
+    <div class="card-header">
+      <h2>5. Integrated Summary of Key Findings on Speed–Crash Relationships</h2>
+    </div>
+    <div class="section-text">
+      <h3>A. Mean Operating Speed Effects</h3>
+      <ul>
+        <li>Mean speed shows mixed relationships with crashes.</li>
+        <li>Rural and freeway studies sometimes show lower crash counts at higher mean speeds, reflecting better design and more homogeneous flow.</li>
+        <li>Urban and arterial environments consistently show higher crash frequency as mean speed increases.</li>
+        <li>Mean speed alone is not a reliable explanatory variable without contextual controls.</li>
+      </ul>
+
+
+      <h3>B. Distribution-Based Metrics (85th Percentile, Differentials)</h3>
+      <ul>
+        <li>Percentile-based metrics (85th) and speed differentials were associated with higher crash risk, especially when differences from posted limits were large.</li>
+        <li>Speed Variability as the Most Consistent Predictor.</li>
+      </ul>
+
+      <h3>C. Combined Effects of High Speed and High Variability</h3>
+      <ul>
+        <li>High mean speeds and high variability each elevate crash risk on their own.</li>
+        <li>When they occur together, risk increases nonlinearly and more sharply than with either factor alone.</li>
+        <li>This supports using at least two speed descriptors (level + variability) in predictive models.</li>
+      </ul>
+
+      <h3>D. Temporal Speed Measures</h3>
+      <ul>
+        <li>Higher weekend–weekday differences and larger temporal variability in speed are associated with more crashes.</li>
+      </ul>
+
+    </div>
+  </section>
+
+  <!-- 8. High-level synthesis -->
+  <section class="card">
+    <div class="card-header">
+      <h2>6. Key Gaps Identified</h2>
+    </div>
+    <div class="section-text">
+      <ol>
+        <li><u>Limited geographic coverage:</u> Several studies focused on a single corridor or metropolitan area; national or multi-state analyses are rare.</li>
+        <li><u>Severity not fully explored:</u> Most studies modeled total crashes; only a few examined fatal or injury crashes separately.</li>
+        <li><u>Inconsistent effects of mean speed</u> highlight confounding with roadway design, which current models do not fully address.</li>
+        <li><u>Limited facility Variation:</u> Few studies covered multiple facility types (rural two-lane, arterials, interstates) within the same framework.</li>
+        <li>Speed–crash relationships often rely on short-duration or corridor-specific datasets, <u>limiting transferability.</u></li>
+      </ol>
+    </div>
+  </section>
+</div>
+
+<script>
+  /* ---- Charts for Sections 3–6 ---- */
+  const metricLabels = [
+    "Mean speed","85th percentile","Speed variability","Speed differential",
+    "Median speed","Within/between-lane var.","Weekend–weekday diff.","Non-peak mean speed"
+  ];
+  const metricValues = [10,4,7,5,1,1,1,1];
+
+  new Chart(document.getElementById("metricChart"), {
+    type: "bar",
+    data: { labels: metricLabels, datasets: [{ data: metricValues }] },
+    options: {
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { ticks: { font: { size: 14 } } },
+        y: { beginAtZero: true, ticks: { precision: 0, font: { size: 14 } } }
+      }
+    }
+  });
+
+  const dataLabels = [
+    "Probe-based space-mean","Per-vehicle trajectories",
+    "Loop detectors (time-mean)","Tube / spot-speed"
+  ];
+  const dataValues = [3,3,3,1];
+
+  new Chart(document.getElementById("dataChart"), {
+    type: "bar",
+    data: { labels: dataLabels, datasets: [{ data: dataValues }] },
+    options: {
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { ticks: { font: { size: 14 } } },
+        y: { beginAtZero: true, ticks: { precision: 0, font: { size: 14 } } }
+      }
+    }
+  });
+
+  const facilityLabels = [
+    "Rural two-lane / highways","Urban arterials",
+    "City streets / collectors","Motorways / freeways","Mixed statewide networks"
+  ];
+  const facilityValues = [4,3,1,5,1];
+
+  new Chart(document.getElementById("facilityChart"), {
+    type: "bar",
+    data: { labels: facilityLabels, datasets: [{ data: facilityValues }] },
+    options: {
+      plugins: { legend: { display: false } },
+      indexAxis: "y",
+      scales: {
+        x: { beginAtZero: true, ticks: { precision: 0, font: { size: 14 } } },
+        y: { ticks: { font: { size: 14 } } }
+      }
+    }
+  });
+
+  const severityLabels = [
+    "Full KABCO Scale",
+    "Some severity classes (Fatal/Injury)","Total Crash Only"
+  ];
+  const severityValues = [6,3,1];
+
+  new Chart(document.getElementById("severityChart"), {
+    type: "bar",
+    data: { labels: severityLabels, datasets: [{ data: severityValues }] },
+    options: {
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { ticks: { font: { size: 14 } } },
+        y: { beginAtZero: true, ticks: { precision: 0, font: { size: 14 } } }
+      }
+    }
+  });
+
+  /* ---- Interactive study explorer ---- */
+
+  const studies = [
+    {
+      citation: "Fahmida et al. (2023)",
+      region: "US",
+      area: "Kentucky, USA",
+      facility: "Rural two-lane highways",
+      speedMetrics: ["Mean","85th percentile","Speed differential"],
+      dataSource: "GPS probe Here Data ",
+      dataType: "Space mean speed",
+      crashType: "Total crashes",
+      severityScale: "Total",
+      model: "Zero-inflated Negative Binomial (ZINB)",
+      keyFinding: "Higher operating speeds were associated with lower crash frequency, likely reflecting better geometric design on higher-speed  routes. Speed effects became more important at higher speed ranges."
+    },
+    {
+      citation: "Gupta et al. (2022)",
+      region: "US",
+      area: "Michigan, USA",
+      facility: "Rural freeways",
+      speedMetrics: ["Mean","85th percentile","Speed variability"],
+      dataSource: "vehicle trajectory data",
+      dataType: "Space mean speed",
+      crashType: "All severities (KABCO)",
+      severityScale: "KABCO",
+      model: "Random-effects Negative Binomial",
+      keyFinding: "Higher mean operating speeds were associated with lower  crashes (counterintuitive). Speed variability showed a strong positive relationship with crash frequency."
+    },
+    {
+      citation: "Park et al. (2021)",
+      region: "US",
+      area: "Austin, Texas, USA",
+      facility: "City streets, non-intersection segments",
+      speedMetrics: ["Mean","85th percentile","Speed variability","Speed differential"],
+      dataSource: "On-road tube counters (time-mean spot speeds)",
+      dataType: "Time mean speed",
+      crashType: "All severities (KABCO)",
+      severityScale: "KABCO",
+      model: "Negative Binomial",
+      keyFinding: "Greater speed variability was associated with higher crash frequency. Larger gaps between posted speed limits and actual operating speeds were associated with more crashes."
+    },
+    {
+      citation: "Das et al. (2020)",
+      region: "US",
+      area: "Ohio & Washington, USA",
+      facility: "All HSIS roadway types (rural emphasis)",
+      speedMetrics: ["Mean","Speed variability","Non-peak mean speed","Weekend–weekday differential"],
+      dataSource: "NPMRDS probe-based speeds (space-mean)",
+      dataType: "Space mean speed",
+      crashType: "All severities (KABCO)",
+      severityScale: "KABCO",
+      model: "Negative Binomial & Tweedie mixed-effects",
+      keyFinding: "Higher hourly/monthly speed variability and larger weekend–weekday differentials were associated with more crashes. Mean speed effects were mixed: positive on rural two-lane roads and negative on Interstates."
+    },
+    {
+      citation: "FHWA (2018) RID Data",
+      region: "US",
+      area: "Washington State, USA",
+      facility: "Urban Interstates and arterials",
+      speedMetrics: ["Mean","85th percentile","Speed differential"],
+      dataSource: "NPMRDS probe-based speeds (5-min)",
+      dataType: "Space mean speed",
+      crashType: "Fatal, injury, and total crashes",
+      severityScale: "FI",
+      model: "Linear & weighted regression",
+      keyFinding: "The ratio of fatal+injury crashes to total crashes showed an unexpected negative relationship with speed differential, largely driven by low-PSL segments, indicating confounding among operating speed, posted speed, and roadway context."
+    },
+
+    {
+      citation: "Lord et al. (2015)",
+      region: "International",
+      area: "England",
+      facility: "Motorways and major roads (SRN)",
+      speedMetrics: ["Mean","Speed differential"],
+      dataSource: "Journey Time Database (15-min loop-detector)",
+      dataType: "Space mean speed",
+      crashType: "Fatal, serious injury, minor injury crashes",
+      severityScale: "FI",
+      model: "Multivariate Poisson Lognormal with spatial effects",
+      keyFinding: "Higher operating speeds were associated with higher crash frequency across severity levels. Speed–crash curves increased with speed until reaching a plateau. Low-volume segments had higher crash rates due to greater speed variation."
+    },
+
+    {
+      citation: "Feng et al. (2019)",
+      region: "International",
+      area: "Shanghai, China",
+      facility: "Major urban arterials (one-way segments)",
+      speedMetrics: ["Mean","Speed variability"],
+      dataSource: "High-frequency GPS taxi data",
+      dataType: "Time mean speed",
+      crashType: "All severities (KABCO)",
+      severityScale: "KABCO",
+      model: "Hierarchical Poisson Log-normal",
+      keyFinding: "Mean operating speed and speed variability both had positive associations with crash frequency, with stronger effects on urban arterials than on freeways or rural roads."
+    },
+    {
+      citation: "Gargoum & El-Basyouny (2016)",
+      region: "International",
+      area: "Edmonton, Canada",
+      facility: "Urban two-lane road segments",
+      speedMetrics: ["Mean","Speed variability"],
+      dataSource: "Individual vehicle speed records",
+      dataType: "Time mean speed",
+      crashType: "All severities (KABCO)",
+      severityScale: "KABCO",
+      model: "Structural Equation Modeling",
+      keyFinding: "Higher mean operating speed increased crash frequency. Speed variability contributed indirectly through its effect on traffic flow and roadway context."
+    },
+    {
+      citation: "Chowdhury et al. (2018)",
+      region: "International",
+      area: "England",
+      facility: "M1 motorway corridor",
+      speedMetrics: ["Mean","Speed variability (within & between lanes)"],
+      dataSource: "MIDAS loop-detector system",
+      dataType: "Time mean speed",
+      crashType: "Fatal, serious injury, minor injury crashes",
+      severityScale: "FI",
+      model: "Multivariate Poisson Lognormal",
+      keyFinding: "Higher within-lane variability increased crash frequency under high volumes; higher between-lane variability increased risk at higher speeds. Joint high speed and high variability greatly amplified crash risk."
+    },
+    {
+      citation: "Rongjie et al. (2018)",
+      region: "International",
+      area: "Shanghai, China",
+      facility: "Multilane freeways with on- and off-ramps",
+      speedMetrics: ["Mean","Median","Speed variability"],
+      dataSource: "Inductive loop detectors",
+      dataType: "Time mean speed",
+      crashType: "All severities (KABCO)",
+      severityScale: "KABCO",
+      model: "Bayesian Random-effects Negative Binomial",
+      keyFinding: "At high operating speeds, higher speeds were positively associated with crashes. Under low-speed congested conditions, higher speed variability (CoV) increased crash risk, with patterns varying across congestion states."
+    }
+  ];
+
+  function uniqueValues(list, selector) {
+    const s = new Set(list.map(selector));
+    return Array.from(s).sort();
+  }
+
+  const regionFilter   = document.getElementById("regionFilter");
+  const facilityFilter = document.getElementById("facilityFilter");
+  const dataFilter     = document.getElementById("dataFilter");
+  const severityFilter = document.getElementById("severityFilter");
+  const searchBox      = document.getElementById("searchBox");
+  const tableBody      = document.getElementById("studyTableBody");
+  const activeSummary  = document.getElementById("activeSummary");
+
+  function initExplorerFilters() {
+    uniqueValues(studies, s => s.facility).forEach(f => {
+      const opt = document.createElement("option");
+      opt.value = f;
+      opt.textContent = f;
+      facilityFilter.appendChild(opt);
+    });
+
+    uniqueValues(studies, s => s.dataType).forEach(d => {
+      const opt = document.createElement("option");
+      opt.value = d;
+      opt.textContent = d;
+      dataFilter.appendChild(opt);
+    });
+
+    uniqueValues(studies, s => s.severityScale).forEach(sev => {
+      const opt = document.createElement("option");
+      opt.value = sev;
+      opt.textContent = sev;
+      severityFilter.appendChild(opt);
+    });
+  }
+
+  function renderActiveSummary(count) {
+    activeSummary.innerHTML = "";
+    const chips = [];
+    chips.push(`Showing ${count} of ${studies.length} studies`);
+    if (regionFilter.value !== "all")
+      chips.push(`Region: ${regionFilter.options[regionFilter.selectedIndex].text}`);
+    if (facilityFilter.value !== "all")
+      chips.push(`Facility: ${facilityFilter.value}`);
+    if (dataFilter.value !== "all")
+      chips.push(`Speed data: ${dataFilter.value}`);
+    if (severityFilter.value !== "all")
+      chips.push(`Severity: ${severityFilter.value}`);
+    if (searchBox.value.trim())
+      chips.push(`Search: "${searchBox.value.trim()}"`);
+
+    chips.forEach(text => {
+      const span = document.createElement("span");
+      span.className = "chip";
+      span.textContent = text;
+      activeSummary.appendChild(span);
+    });
+  }
+
+  function renderTable(list) {
+    tableBody.innerHTML = "";
+    list.forEach(s => {
+      // Split key findings into bullets by sentence
+      const bullets = s.keyFinding
+        .split(/(?<=\.)\s+(?=[A-Z0-9])/)
+        .filter(b => b.trim().length);
+
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>
+          <div class="study-title">${s.citation}</div>
+          <div class="study-meta">
+            <span class="badge ${s.region === "International" ? "international" : ""}">
+              ${s.region === "International" ? "International" : "United States"}
+            </span>
+          </div>
+        </td>
+        <td>
+          <div>${s.area}</div>
+          <div class="study-meta">${s.facility}</div>
+        </td>
+        <td>
+          <div class="speed-metrics">
+            ${s.speedMetrics.map(m => `<span>${m}</span>`).join("")}
+          </div>
+        </td>
+        <td>
+          <div>${s.dataSource}</div>
+          <div class="study-meta">${s.dataType}</div>
+        </td>
+        <td>
+          <div class="study-meta">${s.crashType}</div>
+          <div class="study-meta">${s.model}</div>
+        </td>
+        <td>
+          <ul class="key-findings">
+            ${bullets.map(b => `<li>${b.trim()}</li>`).join("")}
+          </ul>
+        </td>
+      `;
+      tableBody.appendChild(tr);
+    });
+  }
+
+  function applyFilters() {
+    const region   = regionFilter.value;
+    const facility = facilityFilter.value;
+    const dataType = dataFilter.value;
+    const severity = severityFilter.value;
+    const query    = searchBox.value.trim().toLowerCase();
+
+    let filtered = studies.slice();
+
+    if (region !== "all")   filtered = filtered.filter(s => s.region === region);
+    if (facility !== "all") filtered = filtered.filter(s => s.facility === facility);
+    if (dataType !== "all") filtered = filtered.filter(s => s.dataType === dataType);
+    if (severity !== "all") filtered = filtered.filter(s => s.severityScale === severity);
+    if (query) {
+      filtered = filtered.filter(s => {
+        const hay = (
+          s.citation + " " + s.area + " " + s.facility + " " +
+          s.speedMetrics.join(" ") + " " + s.dataSource + " " + s.keyFinding
+        ).toLowerCase();
+        return hay.includes(query);
+      });
+    }
+
+    renderActiveSummary(filtered.length);
+    renderTable(filtered);
+  }
+
+  [regionFilter, facilityFilter, dataFilter, severityFilter].forEach(sel =>
+    sel.addEventListener("change", applyFilters)
+  );
+  searchBox.addEventListener("input", () => {
+    clearTimeout(searchBox._timer);
+    searchBox._timer = setTimeout(applyFilters, 180);
+  });
+
+  initExplorerFilters();
+  applyFilters();
+</script>
+</body>
+</html>
